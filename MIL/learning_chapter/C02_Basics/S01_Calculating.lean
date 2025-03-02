@@ -1,57 +1,48 @@
-import MIL.Common
 import Mathlib.Data.Real.Basic
--- An example.
+import Mathlib.Tactic.Ring
+
 example (a b c : ℝ) : a * b * c = b * (a * c) := by
   rw [mul_comm a b]
   rw [mul_assoc b a c]
 
--- Try these.
+--rw: rewrite，重写
+--mul_comm: 乘法交换律
+--mul_assoc: 乘法结合律
+--by: 一步到位的证明
+
 example (a b c : ℝ) : c * b * a = b * (a * c) := by
-  rw[mul_comm c b]
-  rw[mul_assoc b c a]
-  rw[mul_comm c a]
-
-example (a b c : ℝ) : a * (b * c) = b * (a * c) := by
-  sorry
-
--- An example.
-example (a b c : ℝ) : a * b * c = b * c * a := by
-  rw [mul_assoc]
-  rw [mul_comm]
-
-/- Try doing the first of these without providing any arguments at all,
-   and the second with only one argument. -/
-example (a b c : ℝ) : a * (b * c) = b * (c * a) := by
   sorry
 
 example (a b c : ℝ) : a * (b * c) = b * (a * c) := by
   sorry
 
--- Using facts from the local context.
+--sorry: 用于占位，表示证明尚未完成
+
 example (a b c d e f : ℝ) (h : a * b = c * d) (h' : e = f) : a * (b * e) = c * (d * f) := by
   rw [h']
   rw [← mul_assoc]
   rw [h]
   rw [mul_assoc]
+--使用假设条件证明
 
+--practice
 example (a b c d e f : ℝ) (h : b * c = e * f) : a * b * c * d = a * e * f * d := by
   sorry
 
 example (a b c d : ℝ) (hyp : c = b * a - d) (hyp' : d = a * b) : c = 0 := by
   sorry
 
+--多个重写命令可以通过单个命令执行，通过在方括号内用逗号分隔相关标识符来实现。
 example (a b c d e f : ℝ) (h : a * b = c * d) (h' : e = f) : a * (b * e) = c * (d * f) := by
   rw [h', ← mul_assoc, h, mul_assoc]
 
-section
-
+--另一个技巧是，我们可以在一个例子或定理之外一次性声明变量。Lean 随后会自动包含它们。
 variable (a b c d e f : ℝ)
 
 example (h : a * b = c * d) (h' : e = f) : a * (b * e) = c * (d * f) := by
   rw [h', ← mul_assoc, h, mul_assoc]
 
-end
-
+--通过以下方式，确定各种定理的用法，以及变量的类型
 section
 variable (a b c : ℝ)
 
@@ -66,14 +57,7 @@ variable (a b c : ℝ)
 
 end
 
-section
-variable (a b : ℝ)
-
-example : (a + b) * (a + b) = a * a + 2 * (a * b) + b * b := by
-  rw [mul_add, add_mul, add_mul]
-  rw [← add_assoc, add_assoc (a * a)]
-  rw [mul_comm b a, ← two_mul]
-
+--calc结构化证明，可以看到每一步的推理过程，不需要写by
 example : (a + b) * (a + b) = a * a + 2 * (a * b) + b * b :=
   calc
     (a + b) * (a + b) = a * a + b * a + (a * b + b * b) := by
@@ -83,27 +67,11 @@ example : (a + b) * (a + b) = a * a + 2 * (a * b) + b * b :=
     _ = a * a + 2 * (a * b) + b * b := by
       rw [mul_comm b a, ← two_mul]
 
-example : (a + b) * (a + b) = a * a + 2 * (a * b) + b * b :=
-  calc
-    (a + b) * (a + b) = a * a + b * a + (a * b + b * b) := by
-      sorry
-    _ = a * a + (b * a + a * b) + b * b := by
-      sorry
-    _ = a * a + 2 * (a * b) + b * b := by
-      sorry
 
-end
-
--- Try these. For the second, use the theorems listed underneath.
-section
-variable (a b c d : ℝ)
-
-example : (a + b) * (c + d) = a * c + a * d + b * c + b * d := by
-  sorry
-
+--practice
 example (a b : ℝ) : (a + b) * (a - b) = a ^ 2 - b ^ 2 := by
   sorry
-
+--上边的证明使用下边的这些定理
 #check pow_two a
 #check mul_sub a b c
 #check add_mul a b c
@@ -111,13 +79,7 @@ example (a b : ℝ) : (a + b) * (a - b) = a ^ 2 - b ^ 2 := by
 #check sub_sub a b c
 #check add_zero a
 
-end
-
--- Examples.
-
-section
-variable (a b c d : ℝ)
-
+--请看下边的例子
 example (a b c d : ℝ) (hyp : c = d * a + b) (hyp' : b = a * d) : c = 2 * a * d := by
   rw [hyp'] at hyp
   rw [mul_comm d a] at hyp
@@ -125,6 +87,9 @@ example (a b c d : ℝ) (hyp : c = d * a + b) (hyp' : b = a * d) : c = 2 * a * d
   rw [← mul_assoc 2 a d] at hyp
   exact hyp
 
+--exact: 用于证明目标和假设相等的情况
+
+--当我们导入 Mathlib.Data.Real.Basic 时， ring 策略间接导入，但在下一节中我们将看到它可以用作对除了实数以外的结构进行计算。它可以通过命令 import Mathlib.Tactic 显式导入。我们将看到还有其他类似策略用于其他常见类型的代数结构。
 example : c * b * a = b * (a * c) := by
   ring
 
@@ -138,8 +103,7 @@ example (hyp : c = d * a + b) (hyp' : b = a * d) : c = 2 * a * d := by
   rw [hyp, hyp']
   ring
 
-end
-
+--存在一种名为 rw 的变体，称为 nth_rw ，它允许您仅替换目标中表达式的特定实例。可能的匹配从 1 开始枚举，因此，在以下示例中， nth_rw 2 [h] 替换了 a + b 的第二个出现为 c 。
 example (a b c : ℕ) (h : a + b = c) : (a + b) * (a + b) = a * c + b * c := by
   nth_rw 2 [h]
   rw [add_mul]
